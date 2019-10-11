@@ -21,7 +21,7 @@ app.get('/stock', stocksController.getStock);
 app.get('/summary', summaryController.getSummary);
 
 const port = process.env.PORT || 3000;
-app.listen(port, console.log(`App running on {$port}`));
+app.listen(port, console.log('App running on ', port));
 
 /**
  * var sql = 'SELECT * FROM holdings WHERE name = ? OR address = ?

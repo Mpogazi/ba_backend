@@ -1,11 +1,11 @@
-var db_config = require('../../config/db');
+var mysql_db_config = require('../../config/mysql_db');
 
 exports.getHoldings = (req, res) => {
-    db_config.pool.getConnection((err, conn) => {
+    mysql_db_config.pool.getConnection((err, conn) => {
         if (err)
             return res.status(400).send(err);
         
-        conn.query('SELECT * FROM ccass_holdings_info LIMIT 100', (err, result) => {
+        conn.query('SELECT * FROM ccass_holdings_info LIMIT 10000', (err, result) => {
             if (err) {
                 console.log(err);
                 return;

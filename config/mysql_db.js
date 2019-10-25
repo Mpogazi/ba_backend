@@ -1,10 +1,11 @@
 var mysql = require('mysql');
+var config= require('./config').get(process.env.NODE_ENV);
 
 const pool = mysql.createPool({
-    host: process.env.BOWEN_HOSTNAME || 'ba-db.clt2cjuppshj.ap-southeast-1.rds.amazonaws.com',
-    user: process.env.BOWEN_USERNAME || 'ba_dev',
-    password: process.env.BOWEN_DB_PASSWORD || 'dev',
-    database: 'ba-db'
+    host: config.mysql.hostname,
+    user: config.mysql.username,
+    password: config.mysql.password,
+    database: config.mysql.dbname
 });
 
 

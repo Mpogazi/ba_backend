@@ -45,21 +45,21 @@ exports.logIssue = (message, caller ,loglevel, cb) => {
         const buffer = new Buffer(message);
         fs.open(dir + file_name + ".txt", 'w', function(err, fd) {
             if (err) {
-                cb(err);
+                cb(null,err);
                 console.error(err);
             }
             fs.write(fd, buffer, 0, buffer.length, null, function(err) {
                 if (err) {
-                    cb(err);
+                    cb(null, err);
                     console.error(err);
                 }
                 fs.close(fd, function() {
-                    cb('successfully saved the log');
+                    cb('successfully saved the log', null);
                 });
             })
         })
 
     } catch (err) {
-        console.error(err);
+        cb(null, err);
     }
 }

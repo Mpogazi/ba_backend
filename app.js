@@ -40,10 +40,8 @@ app.get('/holdings',holdingsController.getHoldings);
 app.get('/stock', stocksController.getStock);
 app.get('/summary', summaryController.getSummary);
 
-app.post('/signmeup', userController.signupUser);
-app.post('/signup', function(req, res) {
-    res.send('post request received');
-});
+app.post('/signup', userController.signupUser);
+app.post('/signin', userController.signinUser);
 
 const port = process.env.PORT || 3000;
 app.listen(port, console.log('App running on ', port));

@@ -11,7 +11,7 @@ exports.logLevels = {
 }
 
 exports.logIssue = (message, caller ,loglevel, cb) => {
-    let file_name = ((new Date()).toDateString) + caller; 
+    let file_name = (new Date()).toString().split(" ").join("_")+ "_" + caller + "_"; 
 
     switch (loglevel) {
         case this.logLevels.NOTSET:
@@ -37,29 +37,27 @@ exports.logIssue = (message, caller ,loglevel, cb) => {
             break;
     }
     
-    try {
-        const dir = parentDir + "/reports/logs/";
-        if (!fs.exists(dir)) {
-            fs.mkdirSync(dir)
+    /**
+     * Currently this code assumes that the folder /reports/logs/
+     * exists. This is a tolerable assumption for version 1.0 of
+     * bowen_backend. However, it should be refactored to create
+     * the folder if it doesn't exist.
+     */
+    const dir = parentDir + "/reports/logs/";
+    const buffer = new Buffer(message);
+    fs.open(dir + file_name + ".txt", 'w', function(err, fd) {
+        if (err) {
+            cb(null,err + ' error in open');
+            console.error(err);
         }
-        const buffer = new Buffer(message);
-        fs.open(dir + file_name + ".txt", 'w', function(err, fd) {
+        fs.write(fd, buffer, 0, buffer.length, null, function(err) {
             if (err) {
-                cb(null,err);
+                cb(null, err + ' error in write');
                 console.error(err);
             }
-            fs.write(fd, buffer, 0, buffer.length, null, function(err) {
-                if (err) {
-                    cb(null, err);
-                    console.error(err);
-                }
-                fs.close(fd, function() {
-                    cb('successfully saved the log', null);
-                });
-            })
+            fs.close(fd, function() {
+                cb('successfully saved the log', null);
+            });
         })
-
-    } catch (err) {
-        cb(null, err);
-    }
+    })
 }

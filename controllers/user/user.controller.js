@@ -18,6 +18,7 @@ exports.signupUser = (req, res) => {
                 res.status(400).send('Unknown Error occured');
             }
         } else {
+            req.session.key = req.body.email;
             res.status(200).send(resp);
         }
     });
@@ -28,6 +29,7 @@ exports.signinUser = (req, res) => {
     var password = req.body.password;
     userModel.User.getAuthenticated(email, password, function(error, user, failReason) {
         if (user) {
+            req.session.key = req.body.email;
             res.status(200).send('Success');
         } else {
             switch (failReason) {
@@ -48,10 +50,12 @@ exports.signinUser = (req, res) => {
     });
 };
 
-exports.destroySession = (req, res) => {
-
-};
-
-exports.startSession = (req, res) => {
-
+exports.logout = (req, res) => {
+    req.session.destroy(function(error) {
+        if (error) {
+            res.send('Logged Out with Error');
+        } else {
+            res.send('Logged Out');
+        }
+    });
 };

@@ -5,7 +5,12 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const app = express();
 
-// Setting up Mongodb
+var { redisStore } = require('./config/redis');
+
+/**
+ *
+ *
+ */
 var config = require('./config/config').get(process.env.NODE_ENV);
 var mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
@@ -13,35 +18,56 @@ mongoose.connect(config.mongo.uri, { useUnifiedTopology: true, useNewUrlParser: 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDb Connection error'));
 
+/**
+ *
+ *
+ */
+app.use(session({
+    secret: 'bowen_analytics_web',
+    name: '_bowenUserSpace',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+    store: redisStore
+}));
 
-// Controllers
+/**
+ *
+ *
+ */
 const stocksController = require('./controllers/ccass/stock.controller');
 const holdingsController = require('./controllers/ccass/holdings.controller');
 const summaryController = require('./controllers/ccass/summary.controller');
 const userController = require('./controllers/user/user.controller');
 
-// Use sessions for tracking logins
-app.use(session({
-    secret: 'something',
-    resave: true,
-    saveUninitialized: false
-}));
-
-
-// configs for the app
+/**
+ * 
+ * 
+ */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 
-// Apis && routes
-app.get('/', (req, res) => { res.send('We are hitting the ground running');});
-app.get('/holdings',holdingsController.getHoldings);
-app.get('/stock', stocksController.getStock);
-app.get('/summary', summaryController.getSummary);
+/**
+ * 
+ *  
+ */
+var requireLogin = (req, res, next) => {
+    if(!req.session.key) {
+        res.send('You need to login');
+    } else {
+        next();
+    }
+}
+app.get('/', requireLogin, (req, res) => { res.send('Hello');});
+app.get('/holdings', requireLogin ,holdingsController.getHoldings);
+app.get('/stock', requireLogin, stocksController.getStock);
+app.get('/summary', requireLogin, summaryController.getSummary);
 
 app.post('/signup', userController.signupUser);
 app.post('/signin', userController.signinUser);
+app.get('/logout', requireLogin, userController.logout);
 
 const port = process.env.PORT || 3000;
 app.listen(port, console.log('App running on ', port));

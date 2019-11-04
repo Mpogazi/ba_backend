@@ -1,6 +1,5 @@
 const userModel = require('../../models/user/user.model');
 const reasons   = require('../../models/user/user.model').FailReason;
-const mongoose = require('mongoose');
 
 exports.signupUser = (req, res) => {
     let newUser = new userModel.User({

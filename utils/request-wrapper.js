@@ -5,3 +5,7 @@
  *      can find better interpretations of
  *      the data that we will be sending them.
  */
+
+exports.wrapper_response = (code, resp) => {
+     return { "code": code, "data" : resp };
+}

@@ -1,10 +1,11 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
+const express      = require('express');
+const bodyParser   = require('body-parser');
+const path         = require('path');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const crypto = require('crypto');
-const app = express();
+const csrf         = require('csurf');
+const session      = require('express-session');
+const crypto       = require('crypto');
+const app          = express();
 
 var { redisStore } = require('./config/redis');
 
@@ -61,13 +62,19 @@ var requireLogin = (req, res, next) => {
         next();
     }
 }
-app.get('/', requireLogin, (req, res) => { res.send('Hello');});
+
+var requireCsrf = csrf();
+
+app.get('/', requireCsrf, (req, res) => { 
+    res.cookie('-XSRF-TOKEN', req.csrfToken());
+    res.send('Hello');
+});
 app.get('/holdings', requireLogin ,holdingsController.getHoldings);
 app.get('/stock', requireLogin, stocksController.getStock);
 app.get('/summary', requireLogin, summaryController.getSummary);
 
-app.post('/signup', userController.signupUser);
-app.post('/signin', userController.signinUser);
+app.post('/signup', requireCsrf, userController.signupUser);
+app.post('/signin', requireCsrf, userController.signinUser);
 app.get('/logout', requireLogin, userController.logout);
 
 const port = process.env.PORT || 3000;

@@ -1,5 +1,6 @@
 const userModel = require('../../models/user/user.model');
 const reasons   = require('../../models/user/user.model').FailReason;
+const wrapper   = require('../../utils/request-wrapper');
 const crypto    = require('crypto');
 
 
@@ -14,13 +15,19 @@ exports.signupUser = (req, res) => {
     }).save(function (err, resp) {
         if (err) {
             if (err.code == 11000) {
-                res.status(400).send('User Already exists');
+                res
+                    .status(wrapper.STATUS_CODES.NOT_FOUND)
+                    .send(wrapper.wrapper_response("error",'User Already exists'));
             } else {
-                res.status(400).send('Unknown Error occured');
+                res
+                    .status(wrapper.STATUS_CODES.NOT_FOUND)
+                    .send(wrapper.wrapper_response("error", 'Unknown Error occured'));
             }
         } else {
             req.session.key = req.body.email;
-            res.status(200).send(resp);
+            res
+                .status(wrapper.STATUS_CODES.OK)
+                .send(wrapper.wrapper_response("SUCCESS", ""));
         }
     });
 };
@@ -31,22 +38,28 @@ exports.signinUser = (req, res) => {
     userModel.User.getAuthenticated(email, password, function(error, user, failReason) {
         if (user) {
             req.session.key = crypto.createHash('sha256').update(email).digest('hex');
-            res.status(200).send('Success');
+            res
+                .status(wrapper.STATUS_CODES.OK)
+                .send(wrapper.wrapper_response("SUCCESS", "signed in"));
         } else {
+            var message;
             switch (failReason) {
                 case reasons.NOT_FOUND:
-                    res.status(400).send('User not Found');
+                    message = 'User not Found';
                     break;
                 case reasons.PASSWORD_INCORRECT:
-                    res.status(400).send('Incorrect Password');
+                    message = 'Incorrect Password';
                     break;
                 case reasons.MAX_ATTEMPTS:
-                    res.status(400).send('Maximum number of attempts reached');
+                    message = 'Maximum number of attempts reached';
                     break;
                 default:
-                    res.status(400).send('unknow error');
+                    message = 'unknow error';
                     break;
             }
+            res
+                .status(wrapper.STATUS_CODES.NOT_FOUND)
+                .send(wrapper.wrapper_response("error", message));
         }
     });
 };
@@ -54,9 +67,13 @@ exports.signinUser = (req, res) => {
 exports.logout = (req, res) => {
     req.session.destroy(function(error) {
         if (error) {
-            res.send('Logged Out with Error');
+            res
+                .status(wrapper.STATUS_CODES.SERVER_ERROR)
+                .send(wrapper.wrapper_response("error", 'Logged Out with Error'));
         } else {
-            res.send('Logged Out');
+            res
+                .status(wrapper.STATUS_CODES.OK)
+                .send(wrapper.wrapper_response("SUCCESS",'Logged Out'));
         }
     });
 };

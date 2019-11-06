@@ -1,5 +1,7 @@
 const userModel = require('../../models/user/user.model');
 const reasons   = require('../../models/user/user.model').FailReason;
+const crypto    = require('crypto');
+
 
 exports.signupUser = (req, res) => {
     let newUser = new userModel.User({
@@ -28,7 +30,7 @@ exports.signinUser = (req, res) => {
     var password = req.body.password;
     userModel.User.getAuthenticated(email, password, function(error, user, failReason) {
         if (user) {
-            req.session.key = req.body.email;
+            req.session.key = crypto.createHash('sha256').update(email).digest('hex');
             res.status(200).send('Success');
         } else {
             switch (failReason) {

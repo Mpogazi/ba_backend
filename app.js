@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const crypto = require('crypto');
 const app = express();
 
 var { redisStore } = require('./config/redis');
@@ -23,7 +24,7 @@ db.on('error', console.error.bind(console, 'MongoDb Connection error'));
  *
  */
 app.use(session({
-    secret: 'bowen_analytics_web',
+    secret: crypto.createHash('sha256').update('bowen_users').digest('hex'),
     name: '_bowenUserSpace',
     resave: false,
     saveUninitialized: true,

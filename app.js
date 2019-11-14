@@ -41,6 +41,7 @@ const stocksController = require('./controllers/ccass/stock.controller');
 const holdingsController = require('./controllers/ccass/holdings.controller');
 const summaryController = require('./controllers/ccass/summary.controller');
 const userController = require('./controllers/user/user.controller');
+const errorHandlerController = require('./controllers/reporting/error.controller');
 
 /**
  * 
@@ -77,5 +78,7 @@ app.post('/signup', requireCsrf, userController.signupUser);
 app.post('/signin', requireCsrf, userController.signinUser);
 app.get('/logout', requireLogin, userController.logout);
 
-const port = process.env.PORT || 3000;
+app.post('/error-report', errorHandlerController.logError);
+
+const port = process.env.PORT || 1400;
 app.listen(port, console.log('App running on ', port));

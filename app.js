@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const csrf         = require('csurf');
 const session      = require('express-session');
 const crypto       = require('crypto');
+const currency     = require('./utils/currency');
 const app          = express();
 
 var { redisStore } = require('./config/redis');
@@ -74,25 +75,12 @@ var requireLogin = (req, res, next) => {
     }
 }
 
-
-/**
- * MYSQL REQUESTS:
- *      .select distinct date from db.ccass_holdings_info
- *      .select * from db.static_stock_info
- *      .select * from db.historical_stock_info where date between start_date and end_date and yf_code
- *      .select 
- */
-
 var requireCsrf = csrf();
 
 app.get('/', requireCsrf, (req, res) => { 
-    res.cookie('-XSRF-TOKEN', req.csrfToken());
+    // res.cookie('-XSRF-TOKEN', req.csrfToken());
     res.send(get_yf_end_date());
 });
-
-app.get('/', (req, res) => {
-    res.send('userid: ' + req.params.id + ' otherstuff: ' + req.params.other_stuff + '.');
-})
 
 app.get('/holdings_between_dates/:start_date/:end_date/:code', requireLogin, holdingsController.getHoldingsWithDate);
 app.get('/all_ccass_dates', requireLogin, holdingsController.getAllDates);

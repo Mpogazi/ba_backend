@@ -1,12 +1,20 @@
 var mysql = require('mysql');
-var config= require('./config').get(process.env.NODE_ENV);
 
 const pool = mysql.createPool({
-    host: config.mysql.hostname,
-    user: config.mysql.username,
-    password: config.mysql.password,
-    database: config.mysql.dbname
+    host: 'bowenanalytics-db.c6ax3bdwxsjr.us-east-1.rds.amazonaws.com',
+    user: 'ba_read_only',
+    password: 'ba_read_only',
+    database: 'ba_db'
+});
+
+// For accessing the Yahoo Finance db
+const pool2 = mysql.createPool({
+    host: 'bowenanalytics-db.c6ax3bdwxsjr.us-east-1.rds.amazonaws.com',
+    user: 'ba_read_only',
+    password: 'ba_read_only',
+    database: 'yf_db'
 });
 
 
 exports.pool = pool;
+exports.pool2 = pool2;

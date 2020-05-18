@@ -61,23 +61,29 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
+// Allowing CORS for Testing
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:4200");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
 /**
  * 
  *  
  */
 var requireLogin = (req, res, next) => { 
-    if(!req.session.key) {
-        next();
-        // res.send('You need to login');
-    } else {
-        next();
-    }
+    console.log(req);
+    next();
+    // if(!req.session.key) {
+    //     next();
+    //     // res.send('You need to login');
+    // } else {
+    //     next();
+    // }
 }
 
-var requireCsrf = csrf();
-
-app.get('/', requireCsrf, (req, res) => { 
+app.get('/', (req, res) => { 
     // res.cookie('-XSRF-TOKEN', req.csrfToken());
     res.send(get_yf_end_date());
 });
@@ -97,8 +103,8 @@ app.get('/historical_stock_info/:start_date/:end_date/:yf_code', requireLogin, s
 
 app.get('/summary', requireLogin, summaryController.getSummary);
 
-app.post('/signup', requireCsrf, userController.signupUser);
-app.post('/signin', requireCsrf, userController.signinUser);
+app.post('/signup', userController.signupUser);
+app.post('/signin', userController.signinUser);
 app.get('/logout', requireLogin, userController.logout);
 
 app.post('/error-report', errorHandlerController.logError);

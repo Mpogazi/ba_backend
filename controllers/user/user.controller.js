@@ -8,10 +8,10 @@ exports.signupUser = (req, res) => {
     let newUser = new userModel.User({
         name: req.body.name,
         email: req.body.email,
-        contactNo: req.body.contact,
+        contactNo: req.body.contact || 'Empty',
         creationDate: new Date(),
         password: req.body.password,
-        permissions: 'new Idiot'        
+        permissions: 'User'        
     }).save(function (err, resp) {
         if (err) {
             if (err.code == 11000) {
@@ -21,7 +21,7 @@ exports.signupUser = (req, res) => {
             } else {
                 res
                     .status(wrapper.STATUS_CODES.NOT_FOUND)
-                    .send(wrapper.wrapper_response("error", 'Unknown Error occured'));
+                    .send(wrapper.wrapper_response("error", err));
             }
         } else {
             req.session.key = req.body.email;

@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
 let userSchema = new Schema({
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, minlength: 6, index: { unique: true } },
-    contactNo: { type: String, required: false, minlength: 10 },
+    contactNo: { type: String, required: false, maxlength: 10},
     creationDate: { type: Date, required: true },
     password: { type: String, minlength: 6, required: true },
     loginAttempts: { type: Number, required: true,  default: 0 },

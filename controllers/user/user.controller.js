@@ -6,13 +6,13 @@ const crypto    = require('crypto');
 
 exports.signupUser = (req, res) => {
     let newUser = new userModel.User({
-        name: req.body.name,
+        name: req.body.firstName + " " + req.body.lastName,
         email: req.body.email,
         contactNo: req.body.contact || 'Empty',
         creationDate: new Date(),
         password: req.body.password,
         permissions: 'User'        
-    }).save(function (err, resp) {
+    }).save(function (err, response) {
         if (err) {
             if (err.code == 11000) {
                 res
@@ -27,7 +27,7 @@ exports.signupUser = (req, res) => {
             req.session.key = req.body.email;
             res
                 .status(wrapper.STATUS_CODES.OK)
-                .send(wrapper.wrapper_response("SUCCESS", ""));
+                .send(wrapper.wrapper_response("SUCCESS", response));
         }
     });
 };

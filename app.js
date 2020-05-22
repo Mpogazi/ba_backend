@@ -104,7 +104,7 @@ app.get('/historical_stock_info/:start_date/:end_date/:yf_code', requireLogin, s
 app.get('/summary', requireLogin, summaryController.getSummary);
 
 app.post('/signup', userController.signupUser);
-app.post('/signin', userController.signinUser);
+app.post('/login', userController.signinUser);
 app.get('/logout', requireLogin, userController.logout);
 
 app.post('/error-report', errorHandlerController.logError);

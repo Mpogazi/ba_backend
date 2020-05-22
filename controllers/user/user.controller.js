@@ -1,7 +1,7 @@
 const userModel = require('../../models/user/user.model');
-const reasons   = require('../../models/user/user.model').FailReason;
-const wrapper   = require('../../utils/request-wrapper');
-const crypto    = require('crypto');
+const reasons = require('../../models/user/user.model').FailReason;
+const wrapper = require('../../utils/request-wrapper');
+const crypto = require('crypto');
 
 
 exports.signupUser = (req, res) => {
@@ -11,23 +11,23 @@ exports.signupUser = (req, res) => {
         contactNo: req.body.contact || 'Empty',
         creationDate: new Date(),
         password: req.body.password,
-        permissions: 'User'        
+        permissions: 'User'
     }).save(function (err, response) {
         if (err) {
             if (err.code == 11000) {
                 res
                     .status(wrapper.STATUS_CODES.NOT_FOUND)
-                    .send(wrapper.wrapper_response("error",'User Already exists'));
+                    .send(wrapper.wrapper_response("error", 'User Already exists'));
             } else {
                 res
                     .status(wrapper.STATUS_CODES.NOT_FOUND)
-                    .send(wrapper.wrapper_response("error", err));
+                    .send(wrapper.wrapper_response("error", 'Error Loggin In'));
             }
         } else {
             req.session.key = req.body.email;
             res
                 .status(wrapper.STATUS_CODES.OK)
-                .send(wrapper.wrapper_response("SUCCESS", response));
+                .send(wrapper.wrapper_response("SUCCESS", removeInfo('password',response)));
         }
     });
 };
@@ -35,12 +35,12 @@ exports.signupUser = (req, res) => {
 exports.signinUser = (req, res) => {
     var email = req.body.email;
     var password = req.body.password;
-    userModel.User.getAuthenticated(email, password, function(error, user, failReason) {
+    userModel.User.getAuthenticated(email, password, function (error, user, failReason) {
         if (user) {
             req.session.key = crypto.createHash('sha256').update(email).digest('hex');
             res
                 .status(wrapper.STATUS_CODES.OK)
-                .send(wrapper.wrapper_response("SUCCESS", "signed in"));
+                .send(wrapper.wrapper_response("SUCCESS", removeInfo('password', user)));
         } else {
             var message;
             switch (failReason) {
@@ -65,7 +65,7 @@ exports.signinUser = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    req.session.destroy(function(error) {
+    req.session.destroy(function (error) {
         if (error) {
             res
                 .status(wrapper.STATUS_CODES.SERVER_ERROR)
@@ -73,7 +73,12 @@ exports.logout = (req, res) => {
         } else {
             res
                 .status(wrapper.STATUS_CODES.OK)
-                .send(wrapper.wrapper_response("SUCCESS",'Logged Out'));
+                .send(wrapper.wrapper_response("SUCCESS", 'Logged Out'));
         }
     });
 };
+
+function removeInfo(key, Obj) {
+    Obj[key]=`¯\\_( ͡❛ ͜ʖ ͡❛)_/¯`;
+    return Obj;
+}

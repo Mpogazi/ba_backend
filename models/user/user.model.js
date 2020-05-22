@@ -11,6 +11,10 @@ let userSchema = new Schema({
     contactNo: { type: String, required: false, maxlength: 10},
     creationDate: { type: Date, required: true },
     password: { type: String, minlength: 6, required: true },
+    watchlist: {
+        participants: {type: [String]},
+        stocks: {type: [String]}
+    },
     loginAttempts: { type: Number, required: true,  default: 0 },
     lockUntil: { type: Number },
     permissions: { type: String, required: true }

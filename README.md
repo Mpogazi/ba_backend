@@ -1,4 +1,6 @@
 # BOWEN ANALYTICS BACKEND
 
 ## API Documentation:
-Will document this tomorrow in the event!
+### TO DO:
+Api documentation
+Adding rate-limiting to prevent brute-force attacks

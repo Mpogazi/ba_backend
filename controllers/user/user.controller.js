@@ -24,7 +24,7 @@ exports.signupUser = (req, res) => {
                     .send(wrapper.wrapper_response("error", 'Error Loggin In'));
             }
         } else {
-            req.session.key = req.body.email;
+            req.session.user = {email: req.body.email , role: 'User'};
             res
                 .status(wrapper.STATUS_CODES.OK)
                 .send(wrapper.wrapper_response("SUCCESS", removeInfo('password',response)));
@@ -37,7 +37,7 @@ exports.signinUser = (req, res) => {
     var password = req.body.password;
     userModel.User.getAuthenticated(email, password, function (error, user, failReason) {
         if (user) {
-            req.session.key = crypto.createHash('sha256').update(email).digest('hex');
+            req.session.user = { email: email, role: user.permissions };
             res
                 .status(wrapper.STATUS_CODES.OK)
                 .send(wrapper.wrapper_response("SUCCESS", removeInfo('password', user)));

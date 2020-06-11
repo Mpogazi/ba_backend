@@ -83,7 +83,7 @@ exports.getHistorical = (req, res) => {
 		// Because it'll allow to cache some of the data
 		conn.query(
 			"SELECT * FROM historical_stock_info WHERE yf_code = ?",
-			[req.params.start_date, req.params.end_date, req.params.yf_code],
+			[req.params.yf_code],
 			(err, result) => {
 				if (err) {
 					return res

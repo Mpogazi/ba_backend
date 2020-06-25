@@ -1,6 +1,6 @@
-var mongoose = require("mongoose"),
+var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
-	bcrypt = require("bcrypt"),
+	bcrypt = require('bcrypt'),
 	SALT_FACTOR = 10,
 	MAX_LOGIN_ATTEMPTS = 6,
 	LOCK_TIME = 2 * 60 * 60 * 1000;
@@ -25,10 +25,10 @@ let userSchema = new Schema({
 	permissions: { type: String, required: true },
 });
 
-userSchema.pre("save", function (next) {
+userSchema.pre('save', function (next) {
 	if (!this.creationDate) this.creationDate = new Date();
 	// Hash the password only if it has been modified(or is new)
-	if (!this.isModified("password")) {
+	if (!this.isModified('password')) {
 		return next();
 	}
 
@@ -45,13 +45,7 @@ userSchema.pre("save", function (next) {
 userSchema.methods.incLoginAttempts = function (cb) {
 	// Have previous lock that has expired, restart at 1
 	if (this.lockUntil && this.lockUntil < Date.now()) {
-		return this.updateOne(
-			{
-				$set: { loginAttempts: 1 },
-				$unset: { lockUntil: 1 },
-			},
-			cb
-		);
+		return this.updateOne({ $set: { loginAttempts: 1 }, $unset: { lockUntil: 1 } }, cb);
 	}
 	// Increment
 	var updates = { $inc: { loginAttempts: 1 } };
@@ -71,23 +65,39 @@ var reasons = (userSchema.statics.failedLogin = {
 });
 
 userSchema.statics.addParticipant = function (email, participant, cb) {
-	this.updateOne(
-		{ email: email },
-		{ $push: { "watchlist.participants": participant } },
-		function (err, user) {
-			return cb(err, user, reasons.NOT_FOUND);
+	this.updateOne({ email: email }, { $addToSet: { 'watchlist.participants': participant } }, function (err, user) {
+		if (err) {
+			return cb(err, null, 'Could not add the participant');
 		}
-	);
+		return cb(err, user, null);
+	});
+};
+
+userSchema.statics.rmParticipant = function (email, participant, cb) {
+	this.updateOne({ email: email }, { $pull: { 'watchlist.participants': participant } }, function (err, user) {
+		if (err) {
+			return cb(err, null, 'Could not remove the participant');
+		}
+		return cb(err, user, null);
+	});
 };
 
 userSchema.statics.addStock = function (email, stock, cb) {
-	this.updateOne(
-		{ email: email },
-		{ $push: { "watchlist.stocks": stock } },
-		function (err, user) {
-			return cb(err, user, reasons.NOT_FOUND);
+	this.updateOne({ email: email }, { $addToSet: { 'watchlist.stocks': stock } }, function (err, user) {
+		if (err) {
+			return cb(err, null, 'Could not add the stock');
 		}
-	);
+		return cb(null, user, null);
+	});
+};
+
+userSchema.statics.rmStock = function (email, stock, cb) {
+	this.updateOne({ email: email }, { $pull: { 'watchlist.stocks': stock } }, function (err, user) {
+		if (err) {
+			return cb(err, null, 'Could not add the stock');
+		}
+		return cb(null, user, null);
+	});
 };
 
 userSchema.statics.getAuthenticated = function (email, passwd, cb) {
@@ -135,6 +145,6 @@ userSchema.statics.getAuthenticated = function (email, passwd, cb) {
 };
 
 // Exporting the module
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 exports.User = User;
 exports.FailReason = reasons;

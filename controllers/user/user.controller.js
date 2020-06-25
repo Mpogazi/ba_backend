@@ -53,7 +53,20 @@ exports.addWatchlistParticipant = (req, res) => {
 	});
 };
 
-exports.addWatchlistStock = (req, res) => {};
+exports.addWatchlistStock = (req, res) => {
+	var email = req.body.email;
+	var stock = req.body.stock;
+	userModel.User.addStock(email, stock, function (err, user, failReason) {
+		if (user) {
+			res.status(wrapper.STATUS_CODES.OK).send(
+				wrapper.wrapper_response(
+					"SUCCESS",
+					removeInfo("password", user)
+				)
+			);
+		}
+	});
+};
 
 exports.signinUser = (req, res) => {
 	var email = req.body.email;

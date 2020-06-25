@@ -80,6 +80,16 @@ userSchema.statics.addParticipant = function (email, participant, cb) {
 	);
 };
 
+userSchema.statics.addStock = function (email, stock, cb) {
+	this.updateOne(
+		{ email: email },
+		{ $push: { "watchlist.stocks": stock } },
+		function (err, user) {
+			return cb(err, user, reasons.NOT_FOUND);
+		}
+	);
+};
+
 userSchema.statics.getAuthenticated = function (email, passwd, cb) {
 	this.findOne({ email: email }, function (err, user) {
 		if (err) return cb(err);

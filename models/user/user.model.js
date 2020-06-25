@@ -70,6 +70,16 @@ var reasons = (userSchema.statics.failedLogin = {
 	MAX_ATTEMPTS: 2,
 });
 
+userSchema.statics.addParticipant = function (email, participant, cb) {
+	this.updateOne(
+		{ email: email },
+		{ $push: { "watchlist.participants": participant } },
+		function (err, user) {
+			return cb(err, user, reasons.NOT_FOUND);
+		}
+	);
+};
+
 userSchema.statics.getAuthenticated = function (email, passwd, cb) {
 	this.findOne({ email: email }, function (err, user) {
 		if (err) return cb(err);

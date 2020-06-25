@@ -90,6 +90,16 @@ app.get(
 	requireLogin,
 	stocksController.getHistorical
 );
+app.post(
+	"/add_watchlist_participant",
+	requireLogin,
+	userController.addWatchlistParticipant
+);
+app.post(
+	"/add_watchlist_stock",
+	requireLogin,
+	userController.addWatchlistStock
+);
 
 app.get("/summary", requireLogin, summaryController.getSummary);
 
